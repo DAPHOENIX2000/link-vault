@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Link Vault</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#f8f7f4;color:#1a1a1a;min-height:100vh}
+
+/* TOP NAV */
+nav{background:#fff;border-bottom:1px solid #e8e4dc;padding:0 2rem;display:flex;align-items:center;gap:1rem;height:60px;position:sticky;top:0;z-index:20}
+.nav-logo{font-family:'DM Serif Display',serif;font-size:1.5rem;color:#1a1a1a;margin-right:1rem}
+.nav-logo span{color:#e85d26}
+.nav-search{flex:1;max-width:480px;position:relative}
+.nav-search input{width:100%;background:#f4f2ed;border:1px solid #e0dbd0;border-radius:8px;padding:.55rem 1rem .55rem 2.4rem;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#1a1a1a;outline:none;transition:all .2s}
+.nav-search input:focus{background:#fff;border-color:#e85d26;box-shadow:0 0 0 3px rgba(232,93,38,.1)}
+.nav-search::before{content:'🔍';position:absolute;left:.75rem;top:50%;transform:translateY(-50%);font-size:.8rem;pointer-events:none}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:.6rem}
+.nstat{text-align:center;padding:.3rem .8rem;background:#f4f2ed;border-radius:6px}
+.nstat .nn{font-size:1.2rem;font-weight:700;color:#e85d26;line-height:1}
+.nstat .nl{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:#aaa}
+.add-btn{background:#e85d26;color:#fff;border:none;border-radius:8px;padding:.55rem 1.2rem;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.add-btn:hover{background:#d44d18;transform:translateY(-1px);box-shadow:0 4px 12px rgba(232,93,38,.3)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px)}
+
+/* SIDEBAR */
+.sidebar{background:#fff;border-right:1px solid #e8e4dc;padding:1.5rem 1rem;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.sb-label{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:#bbb;margin-bottom:.6rem;padding:0 .4rem}
+.sb-link{display:flex;align-items:center;justify-content:space-between;padding:.45rem .7rem;border-radius:7px;font-size:.88rem;color:#555;cursor:pointer;transition:all .15s;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.sb-link:hover{background:#f4f2ed;color:#1a1a1a}
+.sb-link.active{background:#fff3ef;color:#e85d26;font-weight:600}
+.sb-count{font-size:.7rem;color:#bbb;background:#f4f2ed;padding:1px 6px;border-radius:10px}
+.sb-link.active .sb-count{background:#fdddd4;color:#e85d26}
+.sb-divider{height:1px;background:#f0ece4;margin:.8rem 0}
+.tag-cloud{display:flex;flex-wrap:wrap;gap:4px;padding:.2rem .2rem}
+.tc-tag{background:#f4f2ed;color:#777;border-radius:5px;padding:3px 8px;font-size:.72rem;cursor:pointer;transition:all .15s;border:none}
+.tc-tag:hover{background:#e8e4dc;color:#1a1a1a}
+.tc-tag.active{background:#fff3ef;color:#e85d26}
+
+/* CONTENT */
+.content{padding:2rem;overflow-y:auto}
+.content-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;gap:1rem;flex-wrap:wrap}
+.content-title{font-family:'DM Serif Display',serif;font-size:1.8rem;color:#1a1a1a}
+.sort-row{display:flex;gap:.4rem}
+.sort-btn{background:#f4f2ed;border:none;color:#777;font-family:'DM Sans',sans-serif;font-size:.78rem;padding:.35rem .8rem;border-radius:6px;cursor:pointer;transition:all .15s}
+.sort-btn:hover{background:#e8e4dc}
+.sort-btn.active{background:#e85d26;color:#fff}
+
+/* CARD GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1rem}
+.card{background:#fff;border:1px solid #e8e4dc;border-radius:12px;overflow:hidden;transition:all .2s;position:relative;cursor:default}
+.card:hover{box-shadow:0 8px 30px rgba(0,0,0,.08);transform:translateY(-2px);border-color:#d4cfc5}
+.card-banner{height:6px}
+.card-body{padding:1.2rem}
+.card-top{display:flex;align-items:flex-start;gap:.7rem;margin-bottom:.7rem}
+.favicon{width:24px;height:24px;border-radius:5px;flex-shrink:0;border:1px solid #f0ece4}
+.card-title{font-size:.92rem;font-weight:600;color:#1a1a1a;line-height:1.35;flex:1;padding-right:1.4rem}
+.card-url{font-size:.72rem;color:#e85d26;text-decoration:none;display:block;margin-bottom:.6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;opacity:.7;transition:opacity .15s}
+.card-url:hover{opacity:1}
+.card-notes{font-size:.78rem;color:#888;line-height:1.5;margin-bottom:.7rem;padding:.5rem .7rem;background:#f8f7f4;border-radius:6px;border-left:2px solid #e8e4dc;font-style:italic}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.7rem}
+.ctag{background:#f4f2ed;color:#777;border-radius:5px;padding:2px 7px;font-size:.68rem;cursor:pointer;transition:all .15s}
+.ctag:hover{background:#fff3ef;color:#e85d26}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-date{font-size:.65rem;color:#bbb;text-transform:uppercase;letter-spacing:.08em}
+.card-actions{display:flex;gap:.3rem;opacity:0;transition:opacity .15s}
+.card:hover .card-actions{opacity:1}
+.ca{background:#f4f2ed;border:none;color:#888;width:28px;height:28px;border-radius:6px;cursor:pointer;font-size:.8rem;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.ca:hover{background:#ffe4d9;color:#e85d26}
+.ca.del:hover{background:#ffe4e4;color:#ef4444}
+.del-x{position:absolute;top:.7rem;right:.7rem;background:none;border:none;color:#ddd;cursor:pointer;font-size:.85rem;transition:color .15s}
+.del-x:hover{color:#ef4444}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(4px);align-items:center;justify-content:center;z-index:100}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:2rem;width:400px;max-width:95vw;box-shadow:0 25px 60px rgba(0,0,0,.15)}
+.modal h2{font-family:'DM Serif Display',serif;font-size:1.6rem;margin-bottom:1.5rem;color:#1a1a1a}
+.modal label{display:block;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#aaa;margin-bottom:.3rem;margin-top:1rem}
+.modal label:first-of-type{margin-top:0}
+.modal input{width:100%;background:#f8f7f4;border:1px solid #e8e4dc;border-radius:8px;padding:.65rem .9rem;font-family:'DM Sans',sans-serif;font-size:.9rem;color:#1a1a1a;outline:none;transition:all .2s}
+.modal input:focus{border-color:#e85d26;box-shadow:0 0 0 3px rgba(232,93,38,.1);background:#fff}
+.modal-btns{display:flex;gap:.6rem;margin-top:1.5rem}
+.mbtn{flex:1;padding:.7rem;border-radius:8px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.9rem;cursor:pointer;border:none;transition:all .15s}
+.mbtn-save{background:#e85d26;color:#fff}
+.mbtn-save:hover{background:#d44d18}
+.mbtn-cancel{background:#f4f2ed;color:#555}
+.mbtn-cancel:hover{background:#e8e4dc}
+
+.empty{grid-column:1/-1;text-align:center;padding:5rem 2rem;color:#ccc}
+.empty .ei{font-size:3.5rem;margin-bottom:1rem}
+.empty p{font-size:1rem;color:#aaa}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a1a;color:#fff;font-family:'DM Sans',sans-serif;font-weight:500;padding:.65rem 1.2rem;border-radius:8px;transform:translateY(80px);transition:transform .3s;z-index:200;font-size:.88rem;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.toast.show{transform:translateY(0)}
+
+@media(max-width:700px){.layout{grid-template-columns:1fr}.sidebar{display:none}nav{padding:0 1rem}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Link<span>Vault</span></div>
+  <div class="nav-search"><input id="search" placeholder="Search your saved links..." oninput="render()"></div>
+  <div class="nav-right">
+    <div class="nstat"><div class="nn" id="hn-links">0</div><div class="nl">Links</div></div>
+    <div class="nstat"><div class="nn" id="hn-tags">0</div><div class="nl">Tags</div></div>
+    <button class="add-btn" onclick="openModal()">+ Save Link</button>
+  </div>
+</nav>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sb-label">Collections</div>
+    <button class="sb-link active" id="all-btn" onclick="filterTag(null)">
+      <span>📚 All Links</span><span class="sb-count" id="sc-all">0</span>
+    </button>
+    <div id="tag-links"></div>
+    <div class="sb-divider"></div>
+    <div class="sb-label">Tag Cloud</div>
+    <div class="tag-cloud" id="tag-cloud"></div>
+  </div>
+
+  <div class="content">
+    <div class="content-header">
+      <div class="content-title" id="page-title">All Links</div>
+      <div class="sort-row">
+        <button class="sort-btn active" onclick="setSort('new',this)">Newest</button>
+        <button class="sort-btn" onclick="setSort('az',this)">A–Z</button>
+        <button class="sort-btn" onclick="setSort('old',this)">Oldest</button>
+        <span style="font-size:.78rem;color:#bbb;align-self:center;margin-left:.4rem" id="rcount"></span>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<!-- ADD URL MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h2>Save a Link</h2>
+    <label>URL *</label>
+    <input id="m-url" type="url" placeholder="https://...">
+    <label>Title</label>
+    <input id="m-title" placeholder="Give it a clear name">
+    <label>Tags <small style="color:#ccc;text-transform:none;letter-spacing:0">(comma separated)</small></label>
+    <input id="m-tags" placeholder="design, tools, inspiration">
+    <label>Notes <small style="color:#ccc;text-transform:none;letter-spacing:0">(optional)</small></label>
+    <input id="m-notes" placeholder="Why are you saving this?">
+    <div class="modal-btns">
+      <button class="mbtn mbtn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="mbtn mbtn-save" onclick="saveLink()">Save It →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const BANNER_COLORS=['#f97316','#8b5cf6','#3b82f6','#10b981','#ec4899','#f59e0b','#06b6d4','#84cc16'];
+let activeTag=null,sortMode='new';
+const host=url=>{try{return new URL(url).hostname}catch{return url}};
+const fav=url=>`https://www.google.com/s2/favicons?sz=32&domain=${host(url)}`;
+const gl=()=>JSON.parse(localStorage.getItem('lv3')||'[]');
+const sl=l=>localStorage.setItem('lv3',JSON.stringify(l));
+
+function openModal(){
+  const u=document.getElementById('search').value.trim();
+  document.getElementById('m-url').value=u.startsWith('http')?u:'';
+  document.getElementById('m-title').value='';
+  document.getElementById('m-tags').value='';
+  document.getElementById('m-notes').value='';
+  document.getElementById('modal').classList.add('open');
+  setTimeout(()=>document.getElementById('m-url').focus(),50);
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal()})
+
+function saveLink(){
+  const url=document.getElementById('m-url').value.trim();
+  if(!url){alert('Please enter a URL');return}
+  const title=document.getElementById('m-title').value.trim()||host(url);
+  const tags=document.getElementById('m-tags').value.split(',').map(t=>t.trim().toLowerCase()).filter(Boolean);
+  const notes=document.getElementById('m-notes').value.trim();
+  const links=gl();
+  const color=BANNER_COLORS[Math.floor(Math.random()*BANNER_COLORS.length)];
+  links.unshift({id:Date.now(),url,title,tags,notes,color,host:host(url),date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})});
+  sl(links);closeModal();render();toast('Link saved!');
+  document.getElementById('search').value='';
+}
+
+function deleteLink(id){sl(gl().filter(l=>l.id!==id));render();toast('Removed')}
+function copyLink(url){navigator.clipboard.writeText(url).then(()=>toast('URL copied!'))}
+
+function filterTag(tag){
+  activeTag=tag;
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  if(!tag)document.getElementById('all-btn').classList.add('active');
+  document.getElementById('page-title').textContent=tag?`#${tag}`:'All Links';
+  render();
+}
+function setSort(m,btn){sortMode=m;document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render()}
+
+function render(){
+  const q=document.getElementById('search').value.toLowerCase();
+  let links=gl();
+  if(activeTag)links=links.filter(l=>l.tags.includes(activeTag));
+  if(q)links=links.filter(l=>l.title.toLowerCase().includes(q)||l.url.toLowerCase().includes(q)||l.tags.some(t=>t.includes(q)));
+  if(sortMode==='az')links=[...links].sort((a,b)=>a.title.localeCompare(b.title));
+  if(sortMode==='old')links=[...links].reverse();
+
+  const all=gl();
+  document.getElementById('hn-links').textContent=all.length;
+  const allTags=[...new Set(all.flatMap(l=>l.tags))];
+  document.getElementById('hn-tags').textContent=allTags.length;
+  document.getElementById('sc-all').textContent=all.length;
+  document.getElementById('rcount').textContent=`${links.length} result${links.length!==1?'s':''}`;
+
+  const tagCounts={};
+  all.forEach(l=>l.tags.forEach(t=>{tagCounts[t]=(tagCounts[t]||0)+1}));
+  const sortedTags=Object.entries(tagCounts).sort((a,b)=>b[1]-a[1]);
+
+  document.getElementById('tag-links').innerHTML=sortedTags.map(([t,c])=>`
+    <button class="sb-link ${activeTag===t?'active':''}" onclick="filterTag('${t}')">
+      <span># ${t}</span><span class="sb-count">${c}</span>
+    </button>`).join('');
+  document.getElementById('tag-cloud').innerHTML=sortedTags.map(([t])=>`
+    <button class="tc-tag ${activeTag===t?'active':''}" onclick="filterTag('${t}')">${t}</button>`).join('');
+
+  const grid=document.getElementById('grid');
+  if(!links.length){
+    grid.innerHTML=`<div class="empty"><div class="ei">🔐</div><p>${activeTag?`No links tagged "${activeTag}"`:'Your vault is empty. Save your first link above!'}</p></div>`;
+    return;
+  }
+  grid.innerHTML=links.map(l=>`
+    <div class="card">
+      <div class="card-banner" style="background:${l.color||'#e85d26'}"></div>
+      <div class="card-body">
+        <button class="del-x" onclick="deleteLink(${l.id})">✕</button>
+        <div class="card-top">
+          <img class="favicon" src="${fav(l.url)}" onerror="this.style.display='none'">
+          <div class="card-title">${l.title}</div>
+        </div>
+        <a class="card-url" href="${l.url}" target="_blank" rel="noopener">${l.host}</a>
+        ${l.notes?`<div class="card-notes">${l.notes}</div>`:''}
+        <div class="card-tags">${l.tags.map(t=>`<span class="ctag" onclick="filterTag('${t}')">#${t}</span>`).join('')}</div>
+        <div class="card-footer">
+          <span class="card-date">${l.date}</span>
+          <div class="card-actions">
+            <button class="ca" onclick="copyLink('${l.url}')" title="Copy URL">📋</button>
+            <button class="ca" onclick="window.open('${l.url}','_blank')" title="Open">↗</button>
+            <button class="ca del" onclick="deleteLink(${l.id})" title="Delete">🗑</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+render();
+</script>
+</body>
+</html>
